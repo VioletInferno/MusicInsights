@@ -50,3 +50,8 @@ Finally, let's create a new table with favorite songs.
 ```{r}
 fav_songs <- tibble(pseudonym = survey$Pseudonym, song = survey$favorite_song, artist = survey$favorite_artist, link = survey$favorite_song_url)
 ```
+
+Use parse_datetime to determine how characters of the date and time are defined within R survey results
+```{r}
+person_table$date_submitted <- as.POSIXlt(parse_datetime(person_table$date_submitted, format="%m/%d/%y %H:%M"))
+```
