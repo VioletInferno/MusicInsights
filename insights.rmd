@@ -31,7 +31,7 @@ colnames(survey)[2] <- "psuedonym_generated"
 colnames(survey)[9] <- "favorite_artist"
 colnames(survey)[11] <- "favorite_song_url"
 colnames(survey)[10] <- "favorite_song"
-
+colnames(preferences)[2] <- "pseudonym"
 ```
 
 Now let's load dplyr and tidyr:
@@ -54,4 +54,20 @@ fav_songs <- tibble(pseudonym = survey$Pseudonym, song = survey$favorite_song, a
 Use parse_datetime to determine how characters of the date and time are defined within R survey results
 ```{r}
 person_table$date_submitted <- as.POSIXlt(parse_datetime(person_table$date_submitted, format="%m/%d/%y %H:%M"))
+```
+
+Convert columns to factors as needed
+```{r}
+person_table$academic_year <- as.factor(person_table$academic_year)
+person_table$major <- as.factor(person_table$major)
+```
+
+Change level to be more consistent
+```{r}
+levels(person_table$major)[levels(person_table$major) == "Computer information systems"] <- "Computer Information Systems"
+```
+
+Create Ratings table using gather
+```{r}
+ratings <- gather(preferences, artist_song, rating, 3:45)
 ```
