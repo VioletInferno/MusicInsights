@@ -1,0 +1,67 @@
+---
+title: "Music Insights Regression"
+author: "John Higdon"
+date: "11/14/2019"
+output: html_document
+---
+
+```{r}
+library("knitr")
+purl("insights.Rmd", output = "part1.r")
+source("part1.r")
+```
+
+Let's create a new table that displays the average rating that a person gave a song, then join that table with our previous person_table so we can use this field in our analysis.
+
+Also, since West Garden failed to indicate their year of birth, we are going to remove them from the data frame. Goodbye West Garden!
+
+```{r}
+avg_rating <- aggregate(rating ~ pseudonym, ratings_new, mean)
+new_person_table <- merge(avg_rating, person_table)
+new_person_table <- new_person_table[-c(42),]  # remove West Gardens entry because they did not indicate year of birth
+```
+
+Before we create our model, let's break up our data into training and testing data sets.
+
+First, we'll need to load the library "caret" to help us out with creating said sets.
+
+Next, we need to separate the new person table we created into a training and testing data sets. We'd like to allocate 75% of the data for training and the remaining 25% for testing.
+
+
+```{r}
+library("caret")
+
+simple_selection <- createDataPartition(new_person_table$year_born, p = 0.75, list = FALSE) # p is the proportion we are splitting up
+train <- new_person_table[simple_selection, ]
+test <- new_person_table[-simple_selection, ]
+```
+
+Now that we have our training and testing datasets, let's build a linear regression model based on the training set we've just created. We're going to investigate if the average rating that a person gave can be predicted by either the year they were born, their sex, academic year, major or way their psuedonym was generated.
+
+```{r}
+model <- lm(rating ~ year_born + sex + academic_year + major + pseudonym_generated, data = train)
+```
+
+We're now ready to begin our prediction process. Let's view a summary of our linear model, then calculate the R^2, RMSE and MAE values (sourced from: http://www.sthda.com/english/articles/38-regression-model-validation/157-cross-validation-essentials-in-r/#model-performance-metrics)
+
+```{r}
+# randomize seed for random number generation
+summary(model)
+
+set.seed(111)
+
+
+# Calculate mean squared difference between the observed and the predicted outcome values.
+# The one that produces the lowest RMSE value is the preffered model when comparing between models.
+predictions <- model %>% predict(test)
+data.frame( R2 = R2(predictions, test$rating),
+            RMSE = RMSE(predictions, test$rating),
+            MAE = MAE(predictions, test$rating))
+
+prediction_error_rate <- RMSE(predictions, test$rating)/mean(test$rating)
+prediction_error_rate
+```
+
+We can see by evaluating the p values generated for each variable that, unfortunately, none of our variables would do well predicting the average rating a person gave to songs.
+
+The prediction error rate is also calculated. We want this to be as low as possible.
