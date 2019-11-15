@@ -7,7 +7,7 @@ output: html_notebook
 First, we need tidyverse to handle data importing and wrangling...
 
 ```{r}
-install.packages("tidyverse")
+#install.packages("tidyverse")
 library("tidyverse")
 
 survey <- read_csv("https://raw.githubusercontent.com/introdsci/MusicSurvey/master/music-survey.csv")
@@ -15,8 +15,6 @@ preferences <- read_csv("https://raw.githubusercontent.com/introdsci/MusicSurvey
 
 colnames(survey)[colnames(survey) == "What is your pseudonym?"] <- "Pseudonym"
 ```
-
-Multiple classmates let me know what we did in the class of 9/26, which I missed due to being called into work (not an excused absence, I let my employer know how upset I was about this.).  
 
 Let's make our dataframes more readable:
 
@@ -69,5 +67,62 @@ levels(person_table$major)[levels(person_table$major) == "Computer information s
 
 Create Ratings table using gather
 ```{r}
-ratings <- gather(preferences, artist_song, rating, 3:45)
+ratings <- tidyr::gather(preferences, artist_song, rating, 3:45)
 ```
+
+Now let's create some visulizations of our data.
+```{r}
+library(ggplot2)
+
+# adds colors for each user that submitted a vote
+ggplot(ratings, aes(x = rating, fill = pseudonym)) + geom_histogram(binwidth = 1)
+
+ggplot(ratings, aes(x = rating, y = pseudonym)) + geom_boxplot()  # there's a problem here. Not able to view boxplot.
+ggplot(ratings, aes(x = pseudonym, y = rating)) + geom_boxplot()
+
+# Box plot with differing colors per pseudonym used
+ggplot(ratings, aes(x = pseudonym, y = rating, fill = pseudonym)) + geom_boxplot()
+
+# Clean up.
+ggplot(ratings, aes(x = pseudonym, y = rating, fill = pseudonym)) + geom_boxplot() + theme_light() + coord_flip()
+```
+
+The following is sourced from Professor Buffardi's repo that was presented 10/25. Source: https://github.com/introdsci/MusicInsights/blob/ref/insights.Rmd
+
+The given code cleans up responses to allow for easier cateogrizing so we can better tidy our data.
+
+```{r}
+MusicalTalents <- tibble(pseudonym = survey$Pseudonym, instruments_played = survey$instruments_played)
+
+MusicalTalents <- separate_rows(MusicalTalents,-pseudonym, sep=",")
+#clean responses for consistency:
+MusicalTalents$instruments_played <- MusicalTalents$instruments_played %>% 
+                                     trimws() %>% 
+                                     tolower() %>%
+                                     str_replace_all(pattern=".*piano.*","piano") %>%
+                                     str_replace_all(pattern=".*ukulele.*","ukulele") %>%
+                                     as.factor()
+```
+
+Mistakes were made by two users. Let's filter out their results. Source is from Professor Buffardi's repo mentioned above.
+
+```{r}
+earliest_time <- min(ratings$Timestamp[ratings$pseudonym=="Angel Angel"])
+ratings_new <- ratings %>% filter(!(pseudonym=="Angel Angel" & Timestamp!=earliest_time))
+earliest_time <- min(ratings$Timestamp[ratings$pseudonym=="Mission Theory"])
+ratings_new <- ratings %>% filter(!(pseudonym=="Mission Theory" & Timestamp!=earliest_time))
+
+ratings_new$artist_song <- str_replace_all(ratings_new$artist_song, 
+                           pattern = "\t", 
+                           replacement = " ")
+```
+
+Now we can view the favorite song of each person who participated in the survey.
+
+```{r}
+favorite_rating <- ratings_new %>% 
+    left_join(fav_songs, by="pseudonym") %>%
+    filter(artist_song==paste(artist,song)) %>%
+    select(pseudonym,artist_song,rating)
+```
+

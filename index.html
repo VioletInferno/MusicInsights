@@ -370,6 +370,7 @@ summary {
 </div>
 
 
+<p>Below sourced from <a href="https://github.com/introdsci/MusicInsights/blob/ref/part2.Rmd#L15" class="uri">https://github.com/introdsci/MusicInsights/blob/ref/part2.Rmd#L15</a> to bring in our previous work into a new Rmd file.</p>
 <pre class="r"><code>library(&quot;knitr&quot;)
 purl(&quot;insights.Rmd&quot;, output = &quot;part1.r&quot;)</code></pre>
 <pre><code>## 
@@ -493,34 +494,32 @@ summary(model)</code></pre>
 ##     pseudonym_generated, data = train)
 ## 
 ## Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -1.92448 -0.61252 -0.08511  0.49347  2.00113 
+##     Min      1Q  Median      3Q     Max 
+## -1.6393 -0.5902 -0.1921  0.5992  2.0236 
 ## 
 ## Coefficients:
 ##                                               Estimate Std. Error t value
-## (Intercept)                                   90.56450   74.52762   1.215
-## year_born                                     -0.04124    0.03755  -1.098
-## sexMale                                       -0.52806    0.51946  -1.017
-## academic_yearSenior                            0.34510    0.43266   0.798
-## academic_yearSophomore                        -0.10220    1.19393  -0.086
-## majorComputer Science                         -2.38838    1.09046  -2.190
-## majorMath                                     -1.74027    1.34251  -1.296
-## pseudonym_generatedFake rapper name generator -0.26481    0.37195  -0.712
-##                                               Pr(&gt;|t|)  
-## (Intercept)                                      0.236  
-## year_born                                        0.283  
-## sexMale                                          0.319  
-## academic_yearSenior                              0.433  
-## academic_yearSophomore                           0.932  
-## majorComputer Science                            0.038 *
-## majorMath                                        0.207  
-## pseudonym_generatedFake rapper name generator    0.483  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## (Intercept)                                   41.25854   66.73973   0.618
+## year_born                                     -0.01830    0.03347  -0.547
+## sexMale                                       -0.48066    0.52033  -0.924
+## academic_yearSenior                            0.48012    0.43792   1.096
+## academic_yearSophomore                         0.20521    1.19118   0.172
+## majorComputer Science                          0.85595    1.07914   0.793
+## majorMath                                      1.33271    1.24747   1.068
+## pseudonym_generatedFake rapper name generator -0.03731    0.38736  -0.096
+##                                               Pr(&gt;|t|)
+## (Intercept)                                      0.542
+## year_born                                        0.589
+## sexMale                                          0.364
+## academic_yearSenior                              0.283
+## academic_yearSophomore                           0.865
+## majorComputer Science                            0.435
+## majorMath                                        0.296
+## pseudonym_generatedFake rapper name generator    0.924
 ## 
-## Residual standard error: 0.989 on 25 degrees of freedom
-## Multiple R-squared:  0.3116, Adjusted R-squared:  0.1188 
-## F-statistic: 1.616 on 7 and 25 DF,  p-value: 0.1768</code></pre>
+## Residual standard error: 1.032 on 25 degrees of freedom
+## Multiple R-squared:  0.1077, Adjusted R-squared:  -0.1421 
+## F-statistic: 0.4311 on 7 and 25 DF,  p-value: 0.8734</code></pre>
 <pre class="r"><code>set.seed(111)
 
 
@@ -531,10 +530,10 @@ data.frame( R2 = R2(predictions, test$rating),
             RMSE = RMSE(predictions, test$rating),
             MAE = MAE(predictions, test$rating))</code></pre>
 <pre><code>##          R2     RMSE      MAE
-## 1 0.2172264 1.605967 1.291802</code></pre>
+## 1 0.6657268 1.621517 1.101496</code></pre>
 <pre class="r"><code>prediction_error_rate &lt;- RMSE(predictions, test$rating)/mean(test$rating)
 prediction_error_rate</code></pre>
-<pre><code>## [1] 0.2788913</code></pre>
+<pre><code>## [1] 0.2595232</code></pre>
 <p>We can see by evaluating the p values generated for each variable that, unfortunately, none of our variables would do well predicting the average rating a person gave to songs.</p>
 <p>The prediction error rate is also calculated. We want this to be as low as possible.</p>
 

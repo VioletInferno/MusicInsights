@@ -5,6 +5,8 @@ date: "11/14/2019"
 output: html_document
 ---
 
+Below sourced from https://github.com/introdsci/MusicInsights/blob/ref/part2.Rmd#L15 to bring in our previous work into a new Rmd file.
+
 ```{r}
 library("knitr")
 purl("insights.Rmd", output = "part1.r")
